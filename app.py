@@ -1,39 +1,78 @@
 import os
-from pathlib import Path
+import streamlit as st
 from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Load Streamlit Cloud secrets
+try:
+    for key in ["GEMINI_API_KEY", "GNANI_API_KEY"]:
+        if key in st.secrets:
+            os.environ[key] = st.secrets[key]
+except Exception:
+    pass
+
+from gemini_service import ask_gemini
 from gnani_service import transcribe_audio
 
-# Load .env from the project folder
-BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / ".env"
+# Page settings
+st.set_page_config(
+    page_title="CampusVoiceAI",
+    page_icon="🎓",
+    layout="centered"
+)
 
-load_dotenv(dotenv_path=ENV_PATH, override=True)
+st.title("🎓 CampusVoiceAI")
+st.write("Your AI-powered college assistant")
 
+st.markdown("---")
 
-def transcribe_audio(audio_file):
-    api_key = os.getenv("GNANI_API_KEY", "").strip()
+st.subheader("💬 Ask your question")
 
-    if not api_key:
-        raise ValueError(
-            "GNANI_API_KEY not found. Please check your .env file."
-        )
+question = st.text_input(
+    "Type your college-related question:"
+)
 
-    # Initialize Gnani Speech-to-Text client
-    client = GnaniSTTClient(api_key=api_key)
+if st.button("Get Answer"):
+    if question.strip():
+        try:
+            with st.spinner("Thinking..."):
+                answer = ask_gemini(question)
+            st.success("Answer:")
+            st.write(answer)
+        except Exception as e:
+            st.error(f"Error: {e}")
+    else:
+        st.warning("Please enter a question.")
 
-    # Reset uploaded file position
-    audio_file.seek(0)
+st.markdown("---")
 
-    # Transcribe Hindi audio using Gnani Prisma
-    result = client.transcribe(
-        audio_file,
-        language_code="hi-IN",
-        model="prisma-v3.0"
-    )
+st.subheader("🎤 Ask using your voice")
 
-    transcript = result.get("transcript", "")
+audio_file = st.audio_input("Record your question")
 
-    if not transcript:
-        raise ValueError("No speech was detected in the audio.")
+if audio_file:
+    st.audio(audio_file)
 
-    return transcript
+    if st.button("Convert Voice to Text"):
+        with st.spinner("Converting your voice..."):
+            transcript = transcribe_audio(audio_file)
+
+        st.write("Your question:")
+        st.write(transcript)
+
+        if transcript and not transcript.startswith("Gnani Error"):
+            if "not found" not in transcript.lower():
+                try:
+                    with st.spinner("Getting answer..."):
+                        answer = ask_gemini(transcript)
+
+                    st.success("CampusVoiceAI Answer:")
+                    st.write(answer)
+
+                except Exception as e:
+                    st.error(f"Gemini Error: {e}")
+
+st.markdown("---")
+st.caption("CampusVoiceAI | B.P. Mandal College of Engineering")
