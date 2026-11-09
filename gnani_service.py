@@ -1,39 +1,28 @@
 import os
-from pathlib import Path
 from dotenv import load_dotenv
 from gnani.stt import GnaniSTTClient
 
-# Load .env from the project folder
-BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / ".env"
-
-load_dotenv(dotenv_path=ENV_PATH, override=True)
-
+load_dotenv()
 
 def transcribe_audio(audio_file):
-    api_key = os.getenv("GNANI_API_KEY", "").strip()
+    api_key = os.getenv("GNANI_API_KEY")
 
     if not api_key:
-        raise ValueError(
-            "GNANI_API_KEY not found. Please check your .env file."
+        return "Error: GNANI_API_KEY is missing. Please check Streamlit Secrets."
+
+    try:
+        client = GnaniSTTClient(api_key=api_key)
+
+        audio_bytes = audio_file.getvalue()
+
+        result = client.transcribe_bytes(
+            audio_bytes,
+            filename=audio_file.name,
+            language_code="hi-IN",
+            model="prisma-v3.0"
         )
 
-    # Initialize Gnani Speech-to-Text client
-    client = GnaniSTTClient(api_key=api_key)
+        return result.get("transcript", "No transcript received.")
 
-    # Reset uploaded file position
-    audio_file.seek(0)
-
-    # Transcribe Hindi audio using Gnani Prisma
-    result = client.transcribe(
-        audio_file,
-        language_code="hi-IN",
-        model="prisma-v3.0"
-    )
-
-    transcript = result.get("transcript", "")
-
-    if not transcript:
-        raise ValueError("No speech was detected in the audio.")
-
-    return transcript
+    except Exception as e:
+        return f"Gnani transcription error: {str(e)}"
