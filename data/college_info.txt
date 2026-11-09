@@ -1,0 +1,15 @@
+College Name: B.P. Mandal College of Engineering
+
+Location: Madhepura, Bihar, India
+
+University: Bihar Engineering University (BEU)
+
+Available Branches:
+1. Computer Science and Engineering
+2. CSE - Artificial Intelligence and Machine Learning
+3. Civil Engineering
+4. Mechanical Engineering
+5. Electrical and Electronics Engineering
+
+Purpose:
+CampusVoice AI helps students get college-related information.
