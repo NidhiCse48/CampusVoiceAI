@@ -35,6 +35,6 @@ watchdog==7.1.0
 websockets==17.4
 streamlit
 python-dotenv
-google-genai
+google-genai==3.0.0
 gnani-vachana
 
