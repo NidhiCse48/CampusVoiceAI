@@ -1,76 +1,28 @@
-import chromadb
-from sentence_transformers import SentenceTransformer
 from pathlib import Path
+import re
 
-# Load embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-# Create local vector database
-client = chromadb.PersistentClient(path="chroma_db")
-
-# Create collection
-collection = client.get_or_create_collection(
-    name="campus_knowledge"
-)
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "data" / "college_info.txt"
 
 
-def load_college_data():
+def retrieve_context(question):
+    if not DATA_FILE.exists():
+        return "College information file is not available."
 
-    file_path = Path("data/college_info.txt")
+    text = DATA_FILE.read_text(encoding="utf-8")
 
-    if not file_path.exists():
-        raise FileNotFoundError("college_info.txt not found!")
+    words = re.findall(r"\w+", question.lower())
+    lines = text.splitlines()
 
-    text = file_path.read_text(encoding="utf-8")
-
-    if not text.strip():
-        raise ValueError("College information file is empty.")
-
-    # Split text into manageable chunks
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-
-    chunks = []
-    current_chunk = ""
+    matching_lines = []
 
     for line in lines:
-        if len(current_chunk) + len(line) > 500 and current_chunk:
-            chunks.append(current_chunk)
-            current_chunk = ""
+        line_lower = line.lower()
 
-        current_chunk += line + "\n"
+        if any(word in line_lower for word in words):
+            matching_lines.append(line)
 
-    if current_chunk:
-        chunks.append(current_chunk)
+    if matching_lines:
+        return "\n".join(matching_lines)
 
-    return chunks
-
-
-def index_college_data():
-
-    chunks = load_college_data()
-
-    embeddings = model.encode(chunks).tolist()
-
-    ids = [f"college_{i}" for i in range(len(chunks))]
-
-    collection.upsert(
-        ids=ids,
-        documents=chunks,
-        embeddings=embeddings
-    )
-
-    return len(chunks)
-
-
-def retrieve_context(question, top_k=3):
-
-    question_embedding = model.encode([question]).tolist()
-
-    results = collection.query(
-        query_embeddings=question_embedding,
-        n_results=min(top_k, collection.count())
-    )
-
-    documents = results.get("documents", [[]])[0]
-
-    return "\n\n".join(documents)
+    return text
