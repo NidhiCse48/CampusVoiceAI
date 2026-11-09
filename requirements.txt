@@ -37,4 +37,4 @@ streamlit
 python-dotenv
 google-genai
 gnani-vachana
-chromadb
+
