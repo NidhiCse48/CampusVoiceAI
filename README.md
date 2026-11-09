@@ -1,10 +1,10 @@
-CampusVoiceAI 🎓
+CampusVoiceAI 
 
 An AI-Powered College Assistant Chatbot
 
 CampusVoiceAI is an intelligent chatbot designed to help students access college-related information quickly and easily.
 
-🚀 Features
+Features
 
 - AI-powered question answering
 - College information assistance
@@ -14,7 +14,7 @@ CampusVoiceAI is an intelligent chatbot designed to help students access college
 - Gemini AI integration
 - Gnani AI voice integration
 
-🛠️ Technologies Used
+Technologies Used
 
 - Python
 - Streamlit
@@ -23,7 +23,7 @@ CampusVoiceAI is an intelligent chatbot designed to help students access college
 - ChromaDB
 - Sentence Transformers
 
-📂 Project Structure
+Project Structure
 
 CampusVoiceAI/
 ├── app.py
@@ -34,8 +34,7 @@ CampusVoiceAI/
 ├── requirements.txt
 └── data/
     └── college_info.txt
-
-⚙️ Installation
+ Installation
 
 1. Clone the repository:
 
@@ -57,17 +56,6 @@ GNANI_API_KEY=your_gnani_api_key
 5. Run the application:
 
 streamlit run app.py
-
-🎯 Objective
-
-To provide students with an easy, interactive, and AI-powered platform for accessing college information.
-
-👩‍💻 Developer
-
-Nidhi Choubey
-
-B.Tech – Computer Science and Engineering
-
 B.P. Mandal College of Engineering, Madhepura
 
 ---
