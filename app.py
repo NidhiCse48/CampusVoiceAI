@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from gnani.stt import GnaniSTTClient
+from gnani_service import transcribe_audio
 
 # Load .env from the project folder
 BASE_DIR = Path(__file__).resolve().parent
